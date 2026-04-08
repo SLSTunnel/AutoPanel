@@ -2,7 +2,12 @@
 
 echo "[KING] Installing WebSocket Tunnel..."
 
-pip3 install websockets
+apt install python3-venv -y
+
+python3 -m venv /opt/wsenv
+source /opt/wsenv/bin/activate
+
+pip install websockets
 
 cat > /usr/local/bin/ws-tunnel.py <<EOF
 import asyncio, websockets, socket
