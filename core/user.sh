@@ -3,34 +3,48 @@
 DB="/etc/autopanel/data/users.db"
 EXP="/etc/autopanel/data/expiry.db"
 
-case $1 in
-create)
-read -p "User: " u
-read -p "Pass: " p
-read -p "Days: " d
+create_user() {
 
-exp=$(date -d "+$d days" +"%Y-%m-%d")
+read -p "Username: " user
+read -p "Password: " pass
+read -p "Days valid: " days
+
+expiry=$(date -d "+$days days" +"%Y-%m-%d")
 uuid=$(cat /proc/sys/kernel/random/uuid)
 
-echo "$u:$(echo -n $p | sha256sum | awk '{print $1}')" >> $DB
-echo "$u $exp" >> $EXP
+hash=$(echo -n "$pass" | sha256sum | awk '{print $1}')
 
+echo "$user:$hash" >> $DB
+echo "$user $expiry" >> $EXP
+
+# Add to Xray
 jq ".inbounds[0].settings.clients += [{\"id\": \"$uuid\"}]" \
-/usr/local/etc/xray/config.json > /tmp/x && mv /tmp/x /usr/local/etc/xray/config.json
+/usr/local/etc/xray/config.json > /tmp/xray.json
 
+mv /tmp/xray.json /usr/local/etc/xray/config.json
 systemctl restart xray
 
-echo "User Created"
-echo "User: $u"
-echo "Pass: $p"
+SERVER=$(cat /etc/autopanel/data/domain.conf 2>/dev/null || curl -s ifconfig.me)
+
+echo ""
+echo "====== ACCOUNT DETAILS ======"
+echo "User: $user"
+echo "Pass: $pass"
+echo "Expiry: $expiry"
+echo ""
+echo "OpenVPN + WS:"
+echo "Server: $SERVER"
+echo "Port: 443"
+echo "Proxy: $SERVER:8080"
+echo "WS Path: /ws"
+echo ""
+echo "XRAY:"
 echo "UUID: $uuid"
-;;
-delete)
-read -p "User: " u
-sed -i "/^$u:/d" $DB
-sed -i "/^$u /d" $EXP
-;;
-list)
-cat $EXP
-;;
+echo "============================="
+}
+
+case $1 in
+create) create_user ;;
+delete) read -p "User: " u; sed -i "/$u/d" $DB ;;
+list) cat $EXP ;;
 esac
