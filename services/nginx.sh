@@ -4,7 +4,7 @@ echo "[KING] Configuring Nginx..."
 
 cat > /etc/nginx/sites-enabled/default <<EOF
 server {
-    listen 8080 default_server;
+    listen 80 default_server;
     server_name _;
 
     location / {
