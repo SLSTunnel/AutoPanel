@@ -1,9 +1,14 @@
 <?php
 session_start();
-if(!$_SESSION['ok']) header("Location:login.php");
+if(!isset($_SESSION['ok'])) header("Location: login.php");
 
-echo "<h2>👑 [KING]DevSupport Panel</h2>";
-echo "<a href='create.php'>Create</a> | <a href='delete.php'>Delete</a><br><br>";
+echo "<h1>👑 [KING]DevSupport Dashboard</h1>";
+echo "<a href='create.php'>Create User</a> | ";
+echo "<a href='delete.php'>Delete User</a><br><br>";
 
-echo nl2br(file_get_contents("/etc/autopanel/data/expiry.db"));
+$data = file("/etc/autopanel/data/expiry.db");
+
+foreach($data as $line){
+    echo $line."<br>";
+}
 ?>
