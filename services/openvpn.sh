@@ -28,7 +28,7 @@ cp ta.key /etc/openvpn/
 cp pki/dh.pem /etc/openvpn/
 
 cat > /etc/openvpn/server.conf <<EOF
-port 8080
+port 1194
 proto tcp
 dev tun
 ca ca.crt
