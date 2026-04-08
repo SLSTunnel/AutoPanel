@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!$_SESSION['ok']) header("Location:login.php");
+if(!isset($_SESSION['ok'])) header("Location: login.php");
 
 if($_POST){
 $user=$_POST['user'];
@@ -13,7 +13,7 @@ $hash=hash("sha256",$pass);
 file_put_contents("/etc/autopanel/data/users.db","$user:$hash\n",FILE_APPEND);
 file_put_contents("/etc/autopanel/data/expiry.db","$user $exp\n",FILE_APPEND);
 
-echo "Created!";
+echo "<h3>Account Created</h3>";
 }
 ?>
 
